@@ -43,8 +43,10 @@ class Window(QMainWindow):
             else:
                 self.spny = self.scroll_speed * self.spny
         if event.key() == Qt.Key_PageUp:
-            self.spnx = self.spnx / self.scroll_speed
-            self.spny = self.spny / self.scroll_speed
+            if self.spnx >= 0.0002:
+                self.spnx = self.spnx / self.scroll_speed
+            if self.spny >= 0.0002:
+                self.spny = self.spny / self.scroll_speed
         if event.key() == Qt.Key_Up and self.y < 85:
             self.y = min(self.y + self.spny / 2, 85)
         if event.key() == Qt.Key_Down and self.y > -85:
