@@ -17,18 +17,18 @@ class Window(QMainWindow):
         if ll is None:
             print('введите координаты (через запятую,без пробела)')
             ll = input()
-        self.ll = ll
+        self.x, self.y = map(float, ll.split(','))
         self.spnx, self.spny = 10, 10
         self.update_image()
 
     def update_image(self):
-        content = tools.get_image(self.ll, spn=f'{self.spnx},{self.spny}')
+        content = tools.get_image(f'{self.x},{self.y}', spn=f'{self.spnx},{self.spny}')
         tools.save_image(self.image_name, content)
         self.pixmap = QPixmap(self.image_name)
         self.im.setPixmap(self.pixmap)
 
     def keyPressEvent(self, event):
-        spnx, spny = self.spnx, self.spny
+        spnx, spny, x, y = self.spnx, self.spny, self.x, self.y
         if event.key() == Qt.Key_PageDown:
             if self.spnx == 90:
                 pass
@@ -45,7 +45,15 @@ class Window(QMainWindow):
         if event.key() == Qt.Key_PageUp:
             self.spnx = self.spnx / self.scroll_speed
             self.spny = self.spny / self.scroll_speed
-        if spnx != self.spnx or spny != self.spny:
+        if event.key() == Qt.Key_Up and self.y < 85:
+            self.y = min(self.y + self.spny / 2, 85)
+        if event.key() == Qt.Key_Down and self.y > -85:
+            self.y = max(self.y - self.spny / 2, -85)
+        if event.key() == Qt.Key_Right and self.x < 85:
+            self.x = min(self.x + self.spnx / 2, 85)
+        if event.key() == Qt.Key_Left and self.x > -85:
+            self.x = max(self.x - self.spnx / 2, -85)
+        if spnx != self.spnx or spny != self.spny or x != self.x or y != self.y:
             self.update_image()
 
     def closeEvent(self, event):
