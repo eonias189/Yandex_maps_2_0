@@ -27,16 +27,10 @@ def get_coords(toponym_name, api_key):
     return (ll, geo)
 
 
-def get_spn(geo_1, geo_2):
-    if not geo_2:
-        r, l, u, d, ll = geo_1
-        dx = (abs(r) - abs(l))
-        dy = (abs(u) - abs(d))
-        return f'{dx},{dy}'
-    ll1 = geo_1[-1]
-    ll2 = geo_2[-1]
-    dx = abs(ll1[0] - ll2[0]) * 2
-    dy = abs(ll1[1] - ll2[1]) * 2
+def get_spn(geo):
+    r, l, u, d, ll = geo
+    dx = (abs(r) - abs(l))
+    dy = (abs(u) - abs(d))
     return f'{dx},{dy}'
 
 
@@ -49,19 +43,24 @@ def get_dist(p1, p2):
     return math.sqrt(sx ** 2 + sy ** 2)
 
 
-def get_image(coords, type='map', add_point=None, geo_2=None):
-    ll, geo_1 = coords
-    spn = get_spn(geo_1, geo_2)
+def get_image(coords, type='map', point=False, spn=None):
+    if not spn:
+        ll, geo = coords
+    else:
+        ll = coords
+    if not spn:
+        spn = get_spn(geo)
     map_params = {
         "ll": ll,
         "spn": spn,
-        "l": type,
-        'pt': f'{ll},comma' if not add_point else f'{ll},comma~{add_point}'
-    }
+        "l": type}
+    if point:
+        map_params['pt'] = f'{ll},comma'
     map_api_server = "http://static-maps.yandex.ru/1.x/"
     response = requests.get(map_api_server, params=map_params)
     if not response:
         print('Ошибка получения изображения')
+        print(response.url)
         exit(4)
     return response.content
 
@@ -88,9 +87,7 @@ def get_business(ll, request, api_key, lang="ru_RU"):
         time = organization["properties"]["CompanyMetaData"]['Hours']['text']
     except Exception:
         time = 'не указано'
-    [[l, d], [r, u]] = json_response['properties']['ResponseMetaData']['SearchResponse']['boundedBy']
-    geo = [float(i) for i in [r, l, u, d]] + [tuple([float(i) for i in point])]
-    return (org_name, org_address, point, time, geo)
+    return (org_name, org_address, point, time)
 
 
 def save_image(name, content):
