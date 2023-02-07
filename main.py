@@ -16,7 +16,7 @@ class Window(QMainWindow):
             print('введите координаты (через запятую,без пробела)')
             ll = input()
         self.ll = ll
-        self.spn = '90,90'
+        self.spn = '10,10'
         self.update_image()
 
     def update_image(self):
