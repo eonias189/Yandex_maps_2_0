@@ -15,11 +15,11 @@ class Window(QMainWindow):
         self.image_name = image_name
         self.scroll_speed = 2
         if ll is None:
-            print('введите координаты (через запятую,без пробела)')
-            ll = input()
+            ll = '45,52'
         self.x, self.y = map(float, ll.split(','))
         self.map_mod = 'map'
         self.spnx, self.spny = 10, 10
+        self.point = None
         self.update_image()
         self.map_mod_c_b = [self.map, self.sat, self.sat_skl]
         for but in self.map_mod_c_b:
@@ -28,6 +28,19 @@ class Window(QMainWindow):
         self.move_b = [self.up, self.right, self.left, self.down]
         for but in self.move_b:
             but.clicked.connect(self.move)
+        self.search.clicked.connect(self.find_toponym)
+
+    def find_toponym(self):
+        toponym_name = self.findline.text()
+        ans = tools.get_coords(toponym_name, tools.API_KEY_GEOCODER)
+        if not ans:
+            self.point = None
+            return
+        coords, geo = ans
+        self.point = coords
+        self.x, self.y = [float(i) for i in coords.split(',')]
+        self.spnx, self.spny = [float(i) for i in tools.get_spn(geo).split(',')]
+        self.update_image()
 
     def move(self):
         text = self.sender().text()
@@ -36,10 +49,10 @@ class Window(QMainWindow):
             self.y = min(self.y + self.spny / 2, 85)
         if text == '↓' and self.y > -85:
             self.y = max(self.y - self.spny / 2, -85)
-        if text == '→' and self.x < 85:
-            self.x = min(self.x + self.spnx / 2, 85)
-        if text == '←' and self.x > -85:
-            self.x = max(self.x - self.spnx / 2, -85)
+        if text == '→' and self.x < 180:
+            self.x = min(self.x + self.spnx / 2, 180)
+        if text == '←' and self.x > -180:
+            self.x = max(self.x - self.spnx / 2, -180)
         if x != self.x or y != self.y:
             self.update_image()
 
@@ -56,7 +69,8 @@ class Window(QMainWindow):
             self.update_image()
 
     def update_image(self):
-        content = tools.get_image(f'{self.x},{self.y}', spn=f'{self.spnx},{self.spny}', type=self.map_mod)
+        content = tools.get_image(f'{self.x},{self.y}', spn=f'{self.spnx},{self.spny}', type=self.map_mod,
+                                  point=self.point)
         tools.save_image(self.image_name, content)
         self.pixmap = QPixmap(self.image_name)
         self.im.setPixmap(self.pixmap)

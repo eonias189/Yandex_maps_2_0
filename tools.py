@@ -14,11 +14,13 @@ def get_coords(toponym_name, api_key):
         "format": "json"}
     response = requests.get(geocoder_api_server, params=geocoder_params)
     if not response:
-        print('Ошибка получения координат')
-        exit(3)
+        return False
     json_resp = response.json()
     toponym = json_resp['response']["GeoObjectCollection"][
-        "featureMember"][0]["GeoObject"]
+        "featureMember"]
+    if len(toponym) == 0:
+        return False
+    toponym = toponym[0]["GeoObject"]
     ll = ','.join(toponym["Point"]["pos"].split())
     envelope = toponym['boundedBy']['Envelope']
     l, d = envelope['lowerCorner'].split(' ')
@@ -29,8 +31,8 @@ def get_coords(toponym_name, api_key):
 
 def get_spn(geo):
     r, l, u, d, ll = geo
-    dx = (abs(r) - abs(l))
-    dy = (abs(u) - abs(d))
+    dx = abs(r - l) / 2
+    dy = abs(u - d) / 2
     return f'{dx},{dy}'
 
 
@@ -43,7 +45,7 @@ def get_dist(p1, p2):
     return math.sqrt(sx ** 2 + sy ** 2)
 
 
-def get_image(coords, type='map', point=False, spn=None):
+def get_image(coords, type='map', point=None, spn=None):
     if not spn:
         ll, geo = coords
     else:
@@ -55,7 +57,7 @@ def get_image(coords, type='map', point=False, spn=None):
         "spn": spn,
         "l": type}
     if point:
-        map_params['pt'] = f'{ll},comma'
+        map_params['pt'] = f'{point},comma'
     map_api_server = "http://static-maps.yandex.ru/1.x/"
     response = requests.get(map_api_server, params=map_params)
     if not response:
