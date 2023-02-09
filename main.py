@@ -49,10 +49,10 @@ class Window(QMainWindow):
             self.y = min(self.y + self.spny / 2, 85)
         if text == '↓' and self.y > -85:
             self.y = max(self.y - self.spny / 2, -85)
-        if text == '→' and self.x < 180:
-            self.x = min(self.x + self.spnx / 2, 180)
-        if text == '←' and self.x > -180:
-            self.x = max(self.x - self.spnx / 2, -180)
+        if text == '→' and self.x < 179.99:
+            self.x = min(self.x + self.spnx / 2, 179.99)
+        if text == '←' and self.x > -179.99:
+            self.x = max(self.x - self.spnx / 2, -179.99)
         if x != self.x or y != self.y:
             self.update_image()
 
