@@ -30,23 +30,27 @@ class Window(QMainWindow):
             but.clicked.connect(self.move)
         self.search.clicked.connect(self.find_toponym)
         self.resert.clicked.connect(self.sbros)
+        self.res.setDisabled(True)
 
     def sbros(self):
         if self.point:
             self.point = None
             self.update_image()
             self.findline.setText('')
+            self.res.setText('')
 
     def find_toponym(self):
         toponym_name = self.findline.text()
         ans = tools.get_coords(toponym_name, tools.API_KEY_GEOCODER)
         if not ans:
             self.point = None
+            self.res.setText('')
             return
-        coords, geo = ans
+        coords, adress, geo = ans
         self.point = coords
         self.x, self.y = [float(i) for i in coords.split(',')]
         self.spnx, self.spny = [float(i) for i in tools.get_spn(geo).split(',')]
+        self.res.setText(adress)
         self.update_image()
 
     def move(self):
