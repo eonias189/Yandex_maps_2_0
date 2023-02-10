@@ -29,6 +29,13 @@ class Window(QMainWindow):
         for but in self.move_b:
             but.clicked.connect(self.move)
         self.search.clicked.connect(self.find_toponym)
+        self.resert.clicked.connect(self.sbros)
+
+    def sbros(self):
+        if self.point:
+            self.point = None
+            self.update_image()
+            self.findline.setText('')
 
     def find_toponym(self):
         toponym_name = self.findline.text()
@@ -78,10 +85,10 @@ class Window(QMainWindow):
     def keyPressEvent(self, event):
         spnx, spny = self.spnx, self.spny
         if event.key() == Qt.Key_PageDown:
-            if self.spnx == 90:
+            if self.spnx == 180:
                 pass
-            elif (90 // self.scroll_speed) < self.spnx < 90:
-                self.spnx = 90
+            elif (180 // self.scroll_speed) < self.spnx < 180:
+                self.spnx = 180
             else:
                 self.spnx = self.scroll_speed * self.spnx
             if self.spny == 90:
@@ -91,7 +98,7 @@ class Window(QMainWindow):
             else:
                 self.spny = self.scroll_speed * self.spny
         if event.key() == Qt.Key_PageUp:
-            if self.spnx >= 0.0002:
+            if self.spnx >= 0.0004:
                 self.spnx = self.spnx / self.scroll_speed
             if self.spny >= 0.0002:
                 self.spny = self.spny / self.scroll_speed
