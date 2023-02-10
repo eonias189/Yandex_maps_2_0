@@ -22,12 +22,21 @@ def get_coords(toponym_name, api_key):
         return False
     toponym = toponym[0]["GeoObject"]
     adress = toponym['metaDataProperty']['GeocoderMetaData']['Address']['formatted']
+    try:
+        ind = \
+            toponym["metaDataProperty"]["GeocoderMetaData"]['AddressDetails']['Country']['AdministrativeArea'][
+                'SubAdministrativeArea'][
+                'Locality'][
+                'Thoroughfare']['Premise']['PostalCode']['PostalCodeNumber']
+    except Exception:
+        ind = 'не определён'
+    ind = f'индекс: {ind}'
     ll = ','.join(toponym["Point"]["pos"].split())
     envelope = toponym['boundedBy']['Envelope']
     l, d = envelope['lowerCorner'].split(' ')
     r, u = envelope['upperCorner'].split(' ')
     geo = [float(i) for i in [r, l, u, d]] + [tuple([float(i) for i in ll.split(',')])]
-    return (ll, adress, geo)
+    return (ll, adress, ind, geo)
 
 
 def get_spn(geo):

@@ -46,10 +46,12 @@ class Window(QMainWindow):
             self.point = None
             self.res.setText('')
             return
-        coords, adress, geo = ans
+        coords, adress, ind, geo = ans
         self.point = coords
         self.x, self.y = [float(i) for i in coords.split(',')]
         self.spnx, self.spny = [float(i) for i in tools.get_spn(geo).split(',')]
+        if self.ind.isChecked():
+            adress += '\n' + ind
         self.res.setText(adress)
         self.update_image()
 
