@@ -31,6 +31,15 @@ class Window(QMainWindow):
         self.search.clicked.connect(self.find_toponym)
         self.resert.clicked.connect(self.sbros)
         self.res.setDisabled(True)
+        self.adress = ''
+        self.index = ''
+        self.ind.clicked.connect(self.update_adress)
+
+    def update_adress(self):
+        text = self.adress
+        if self.ind.isChecked():
+            text += f'\n{self.index}'
+        self.res.setText(text)
 
     def sbros(self):
         if self.point:
@@ -46,13 +55,12 @@ class Window(QMainWindow):
             self.point = None
             self.res.setText('')
             return
-        coords, adress, ind, geo = ans
+        coords, self.adress, self.index, geo = ans
+        print('+')
         self.point = coords
         self.x, self.y = [float(i) for i in coords.split(',')]
         self.spnx, self.spny = [float(i) for i in tools.get_spn(geo).split(',')]
-        if self.ind.isChecked():
-            adress += '\n' + ind
-        self.res.setText(adress)
+        self.update_adress()
         self.update_image()
 
     def move(self):
